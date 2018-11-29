@@ -11,14 +11,30 @@ module.exports = function(RED) {
 
     var username = this.credentials.username;
     var password = this.credentials.password;
+    
+    //https://www.ibm.com/watson/developercloud/speech-to-text/api/v1/node.html?node#authentication
+    var iam_apikey = this.credentials.iam_apikey;
+    var url = this.credentials.url;
 
     var micOption = {};
     micOption.command = node.cmd;
     var mic = new Mic(micOption);
-    var speech_to_text= new SpeechToTextV1({
-            username: username,
-            password: password
-          });
+    
+    var speech_to_text;
+    
+    if ( username === undefined || password === undefined) {
+            speech_to_text = new SpeechToTextV1({
+              iam_apikey: iam_apikey,
+              url: url
+            });
+    } 
+    else {  
+      speech_to_text = new SpeechToTextV1({
+              username: username,
+              password: password
+            });
+    }
+    
     var voice = null;
     var watson = null;
     var listening = false;
@@ -112,7 +128,9 @@ module.exports = function(RED) {
   RED.nodes.registerType('streaming-stt', StreamingStt,{
     credentials: {
       username: {type: 'text'},
-      password: {type: 'password'}
+      password: {type: 'password'},
+      iam_apikey: {type: 'password'},
+      url: {type: 'text'}
     }
   });
 };
